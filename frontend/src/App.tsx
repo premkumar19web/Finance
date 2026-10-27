@@ -1,122 +1,69 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import type { ReactNode } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router';
+import { AuthProvider } from './auth/AuthProvider';
+import { RequireAuth, RequirePermission } from './auth/guards';
+import { Layout } from './components/Layout';
+import { EmptyState } from './components/ui';
+import { AuditLogsPage } from './pages/admin/AuditLogsPage';
+import { BranchesPage } from './pages/admin/BranchesPage';
+import { RolesPage } from './pages/admin/RolesPage';
+import { SettingsPage } from './pages/admin/SettingsPage';
+import { UsersPage } from './pages/admin/UsersPage';
+import { AssignmentsPage } from './pages/AssignmentsPage';
+import { AgentDashboardPage } from './pages/collections/AgentDashboardPage';
+import { DailyCollectionsPage } from './pages/collections/DailyCollectionsPage';
+import { WeeklyCollectionsPage } from './pages/collections/WeeklyCollectionsPage';
+import { CustomerDetailPage } from './pages/customers/CustomerDetailPage';
+import { CustomersPage } from './pages/customers/CustomersPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { ExpensesPage } from './pages/ExpensesPage';
+import { LoanDetailPage } from './pages/loans/LoanDetailPage';
+import { LoansPage } from './pages/loans/LoansPage';
+import { NewLoanPage } from './pages/loans/NewLoanPage';
+import { LoginPage } from './pages/LoginPage';
+import { PaymentDetailPage } from './pages/payments/PaymentDetailPage';
+import { PaymentEntryPage } from './pages/payments/PaymentEntryPage';
+import { PaymentsPage } from './pages/payments/PaymentsPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { ReportsPage } from './pages/ReportsPage';
 
-function App() {
-  const [count, setCount] = useState(0)
+const guard = (any: string[], page: ReactNode) => <RequirePermission any={any}>{page}</RequirePermission>;
 
+const router = createBrowserRouter([
+  { path: '/login', element: <LoginPage /> },
+  {
+    element: <RequireAuth><Layout /></RequireAuth>,
+    children: [
+      { index: true, element: guard(['dashboard.view'], <DashboardPage />) },
+      { path: 'agent', element: guard(['collections.view'], <AgentDashboardPage />) },
+      { path: 'customers', element: guard(['customers.view'], <CustomersPage />) },
+      { path: 'customers/:id', element: guard(['customers.view'], <CustomerDetailPage />) },
+      { path: 'loans', element: guard(['loans.view'], <LoansPage />) },
+      { path: 'loans/new', element: guard(['loans.create'], <NewLoanPage />) },
+      { path: 'loans/:id', element: guard(['loans.view'], <LoanDetailPage />) },
+      { path: 'collections/daily', element: guard(['collections.view'], <DailyCollectionsPage />) },
+      { path: 'collections/weekly', element: guard(['collections.view'], <WeeklyCollectionsPage />) },
+      { path: 'payments', element: guard(['payments.view'], <PaymentsPage />) },
+      { path: 'payments/new', element: guard(['payments.create'], <PaymentEntryPage />) },
+      { path: 'payments/:id', element: guard(['payments.view'], <PaymentDetailPage />) },
+      { path: 'assignments', element: guard(['assignments.view'], <AssignmentsPage />) },
+      { path: 'expenses', element: guard(['expenses.view'], <ExpensesPage />) },
+      { path: 'reports', element: guard(['reports.view'], <ReportsPage />) },
+      { path: 'branches', element: guard(['branches.view'], <BranchesPage />) },
+      { path: 'users', element: guard(['users.view'], <UsersPage />) },
+      { path: 'roles', element: guard(['roles.view'], <RolesPage />) },
+      { path: 'audit-logs', element: guard(['audit.view'], <AuditLogsPage />) },
+      { path: 'settings', element: guard(['settings.view'], <SettingsPage />) },
+      { path: 'profile', element: <ProfilePage /> },
+      { path: '*', element: <EmptyState icon="search" title="Page not found" message="Check the address or use the menu." /> },
+    ],
+  },
+]);
+
+export default function App() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }
-
-export default App
